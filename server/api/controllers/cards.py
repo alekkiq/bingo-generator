@@ -1,6 +1,7 @@
 from flask import request, jsonify, make_response, Response, g
 from typing import Optional
-from ..model.generator import Card, CardGenerator
+from urllib.parse import urlparse
+from api.model.generator import Card, CardGenerator
 import html
 
 
@@ -12,7 +13,7 @@ def parse_boolean(value, default = False) -> bool:
         default (bool, optional): fallback default boolean value. Defaults to False.
     
     Returns:
-        boolean: parsed boolean or `false`
+        bool: parsed boolean or `false`
     """
     if value is None:
         return default
@@ -34,6 +35,30 @@ def parse_integer(value, default = 1) -> int:
         return int(value)
     except (TypeError, ValueError):
         return default
+    
+def _is_allowed_image_url(url: str, allowed_hosts: set) -> bool:
+    """Checks if an URL is of allowed format
+
+    Args:
+        url (str): the URL to check
+        allowed_hosts (set): set of allowed hosts
+
+    Returns:
+        bool: whether the URL is valid
+    """
+    try:
+        parsed = urlparse(url)
+    except Exception:
+        return False
+    
+    if not parsed.scheme and not parsed.netloc and parsed.path.startswith('/static/'):
+        return True
+    
+    if parsed.scheme in ("http", "https") and parsed.netloc:
+        host = parsed.netloc.split(':')[0].lower()
+        return host in allowed_hosts
+    
+    return False
     
 class CardsController:
     def __init__(self, generator: CardGenerator):
@@ -126,5 +151,54 @@ class CardsController:
 
             return res
         finally:
-            # restore previous value to avoid leaking into other requests
+            self.generator.game_number = prev_game_number
+            
+    def preview_card(self) -> Response:
+        """
+        Return a single-card HTML preview using the same CSS as the main HTML output.
+        Accepts the same query/form parameters as the other endpoints (free_center, free_center_value, seed, etc.)
+        """
+        params = self.get_params()
+
+        prev_game_number = getattr(self.generator, "game_number", None)
+        self.generator.game_number = params.get("game_number", None)
+
+        try:
+            # generate a single card; uniqueness isn't important for preview
+            cards = self.generator.generate_cards(
+                count = 1,
+                free_center = params["free_center"],
+                free_center_value = params["free_center_value"],
+                unique = False,
+                seed = params["seed"]
+            )
+
+            card_html = self.generator.card_to_html(cards[0], card_id=1)
+            fragment = parse_boolean(request.values.get("fragment", "").lower(), True)
+            
+            if fragment:
+                res = make_response(card_html)
+                res.headers["Content-Type"] = "text/html; charset=utf-8"
+                return res
+            
+            css_link = '<link rel="stylesheet" href="/static/bingo.css">'
+            html_output = "\n".join([
+                "<!DOCTYPE html>",
+                "<html>",
+                "<head>",
+                '<meta charset="utf-8">',
+                '<meta name="viewport" content="width=device-width,initial-scale=1">',
+                css_link,
+                "</head>",
+                "<body>",
+                card_html,
+                "</body>",
+                "</html>",
+            ])
+
+            res = make_response(html_output)
+            res.headers["Content-Type"] = "text/html; charset=utf-8"
+            
+            return res
+        finally:
             self.generator.game_number = prev_game_number

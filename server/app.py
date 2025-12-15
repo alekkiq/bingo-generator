@@ -31,7 +31,7 @@ def api_cards():
 
 @app.get("/api/preview")
 def preview_card():
-    return ""
+    return controller.preview_card()
 
 
 @app.get("/api/html")
