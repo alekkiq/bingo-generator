@@ -24,6 +24,7 @@ bingo_title = "Joulubingo"
 bingo_footer = "KaMAn tekniikan pikkujoulut 2025"
 free_center_content = f'<img src="kama.png" alt="KaMA logo">'
 cards_per_A4 = 4 # cards per A4 page -> should be 1 or 4
+game_number = "2"
 
 def generate_card(free_center=False):
     """
@@ -60,7 +61,7 @@ def card_to_html(card, card_id):
 
     return f"""
     <div class="card" data-id="{card_id}">
-        <div class="card-title">{bingo_title}</div>
+        <div class="card-title">{bingo_title}<span class="game-number">{game_number}</span></div>
         <table class="bingo">
             <thead>
                 <tr>
@@ -80,7 +81,7 @@ def generate_html(cards):
         "<html>",
         "<head>",
         "<meta charset='utf-8'>",
-        "<title>Bingo Cards</title>",
+        "<title>Bingo cards</title>",
         "<link rel='stylesheet' href='bingo.css'>",
         "</head>",
         "<body>",
