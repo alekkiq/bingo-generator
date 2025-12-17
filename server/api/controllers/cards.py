@@ -65,8 +65,11 @@ class CardsController:
         self.generator = generator
         
     def get_params(self) -> dict:
-        """Gets parameters from the query/form and returns them sanitized"""
+        """Gets params from a query and normalizes/validates them accordinly
 
+        Returns:
+            dict: normalized and validated parameters for the engine
+        """
         cards_amount = parse_integer(request.values.get("amount"), 8)
         cards_amount = max(1, min(cards_amount, 500))
 
@@ -99,6 +102,9 @@ class CardsController:
         if cards_per_page not in (1, 2, 4, 6):
             cards_per_page = 4
 
+        title = request.values.get("title", None)
+        footer = request.values.get("footer", None)
+
         return {
             "num": cards_amount,
             "free_center": free_center,
@@ -106,13 +112,28 @@ class CardsController:
             "unique": unique,
             "seed": seed,
             "cards_per_page": cards_per_page,
-            "game_number": game_number
+            "game_number": game_number,
+            "title": title,
+            "footer": footer
         }
         
     def json_cards(self) -> Response:
+        """Generates cards and returns them in JSON format
+
+        Returns:
+            Response: jsonified cards output
+        """
         params = self.get_params()
         prev_game_number = getattr(self.generator, "game_number", None)
+        prev_title = getattr(self.generator, "title", None)
+        prev_footer = getattr(self.generator, "footer", None)
+
         self.generator.game_number = params.get("game_number", None)
+        if params.get("title") is not None:
+            self.generator.title = params["title"]
+        if params.get("footer") is not None:
+            self.generator.footer = params["footer"]
+
         try:
             cards = self.generator.generate_cards(
                 count = params["num"],
@@ -126,8 +147,17 @@ class CardsController:
             return jsonify({"cards": output})
         finally:
             self.generator.game_number = prev_game_number
+            if prev_title is not None:
+                self.generator.title = prev_title
+            if prev_footer is not None:
+                self.generator.footer = prev_footer
     
     def html_cards(self) -> Response:
+        """Generates cards and returns them in HTML format
+
+        Returns:
+            Response: html response containing the print-ready cards
+        """
         params = self.get_params()
 
         prev_game_number = getattr(self.generator, "game_number", None)
@@ -154,9 +184,10 @@ class CardsController:
             self.generator.game_number = prev_game_number
             
     def preview_card(self) -> Response:
-        """
-        Return a single-card HTML preview using the same CSS as the main HTML output.
-        Accepts the same query/form parameters as the other endpoints (free_center, free_center_value, seed, etc.)
+        """Return a single-card HTML preview using the same CSS as the main HTML output.
+        
+        Returns:
+            Response: html response containing the preview card
         """
         params = self.get_params()
 
@@ -164,7 +195,6 @@ class CardsController:
         self.generator.game_number = params.get("game_number", None)
 
         try:
-            # generate a single card; uniqueness isn't important for preview
             cards = self.generator.generate_cards(
                 count = 1,
                 free_center = params["free_center"],

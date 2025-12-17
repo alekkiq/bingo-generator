@@ -55,7 +55,7 @@ class CardGenerator:
         free_center: bool = False,
         free_center_value: Optional[str] = None,
         unique: bool = True,
-        seed: Optional[int] = None,
+        seed: Optional[int|str] = None,
     ) -> List[Card]:
         if seed is not None:
             random.seed(seed)
@@ -103,8 +103,8 @@ class CardGenerator:
         parts = []
         game_number = f'<span class="game-number">{self.game_number}</span>'
         
-        parts.append(f'<div id="card-{card_id}" class="card">')
-        parts.append(f"""<div class="card-title">{html.escape(self.title)}{game_number if self.game_number else ''}</div>""")
+        parts.append(f'<div id="card-{card_id}" class="bingo-card">')
+        parts.append(f"""<div class="bingo-card-title">{html.escape(self.title)}{game_number if self.game_number else ''}</div>""")
         
         parts.append('<table class="bingo">')
         parts.append('<thead><tr><th>B</th><th>I</th><th>N</th><th>G</th><th>O</th></tr></thead>')
@@ -129,7 +129,7 @@ class CardGenerator:
             parts.append('</tr>')
             
         parts.append('</tbody></table>')
-        parts.append(f'<div class="card-footer">{html.escape(self.footer)}</div>')
+        parts.append(f'<div class="bingo-card-footer">{html.escape(self.footer)}</div>')
         parts.append('</div>')
                         
         return "\n".join(parts)
