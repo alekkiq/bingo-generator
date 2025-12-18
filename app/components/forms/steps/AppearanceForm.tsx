@@ -70,6 +70,13 @@ const AppearanceForm: React.FC<AppearanceFormProps> = ({
         onChange={(e) => onChange({ background: e.target.value })}
       />
       <TextField
+        label="Text color"
+        type="color"
+        fullWidth
+        value={styles.textColor}
+        onChange={(e) => onChange({ textColor: e.target.value })}
+      />
+      <TextField
         label="Table color"
         type="color"
         fullWidth
@@ -77,11 +84,11 @@ const AppearanceForm: React.FC<AppearanceFormProps> = ({
         onChange={(e) => onChange({ tableColor: e.target.value })}
       />
       <TextField
-        label="Text color"
+        label="Border color"
         type="color"
         fullWidth
-        value={styles.textColor}
-        onChange={(e) => onChange({ textColor: e.target.value })}
+        value={styles.borderColor}
+        onChange={(e) => onChange({ borderColor: e.target.value })}
       />
       <TextField
         label="Game number background"

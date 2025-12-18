@@ -13,8 +13,9 @@ import {
   IconButton,
   Button,
 } from "@mui/material";
-import { ExpandMore, Info, CloudUpload } from "@mui/icons-material";
+import { Info } from "@mui/icons-material";
 import { GeneratorConfig } from "@/schemas/generator";
+import LabeledInput from "../fields/LabeledInput";
 
 interface GameSetupFormProps {
   game: GeneratorConfig["game"];
@@ -27,18 +28,37 @@ const GameSetupForm: React.FC<GameSetupFormProps> = ({ game, onChange }) => {
       <Typography variant="h4" component="h2">
         Game settings
       </Typography>
-      <TextField
-        label="Title"
+
+      <LabeledInput
+        id="bingo-title"
+        label="Game title"
         type="text"
+        variant="filled"
+        tooltip="Game title shown on top of each bingo card"
         fullWidth
         value={game.title ?? ""}
         onChange={(e) =>
           onChange({ title: e.target.value === "" ? "" : e.target.value })
         }
       />
-      <TextField
+      <LabeledInput
+        id="bingo-footer"
         label="Footer text"
         type="text"
+        variant="filled"
+        tooltip="Additional text to show below the bingo card"
+        fullWidth
+        value={game.footer ?? ""}
+        onChange={(e) =>
+          onChange({ footer: e.target.value === "" ? "" : e.target.value })
+        }
+      />
+      <LabeledInput
+        id="game-number"
+        label="Game number"
+        type="number"
+        variant="filled"
+        tooltip="Additional text to show below the bingo card"
         fullWidth
         value={game.footer ?? ""}
         onChange={(e) =>
@@ -55,6 +75,19 @@ const GameSetupForm: React.FC<GameSetupFormProps> = ({ game, onChange }) => {
             gameNumber:
               e.target.value === "" ? undefined : Number(e.target.value),
           })
+        }
+      />
+      <FormControlLabel
+        label="Empty grid"
+        control={
+          <Switch
+            checked={!!game.emptyGrid}
+            onChange={(e) =>
+              onChange({
+                emptyGrid: e.target.checked,
+              })
+            }
+          />
         }
       />
       <FormControlLabel

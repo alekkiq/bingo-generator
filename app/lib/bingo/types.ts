@@ -13,7 +13,12 @@ export type NumberCell = {
   value: number;
 };
 
-export type Cell = TextCell | ImageCell | NumberCell;
+export type EmptyCell = {
+  type: "empty";
+  value: string;
+};
+
+export type Cell = TextCell | ImageCell | NumberCell | EmptyCell;
 
 export interface Card {
   B: Cell[];

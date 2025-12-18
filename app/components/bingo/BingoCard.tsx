@@ -25,19 +25,18 @@ const renderCell = (cell: Cell) => {
           className="block object-cover w-full h-auto aspect-square"
         />
       );
+    case "empty":
+      return <span className="opacity-0">{cell.value}</span>;
   }
 };
 
-// TODO: tailwindize
-export const BingoCard: React.FC<BingoCardProps> = ({
+const BingoCard: React.FC<BingoCardProps> = ({
   card,
   style,
   title,
   footer,
   gameNumber,
 }) => {
-  const cardMatrix = card.grid;
-
   return (
     <div
       className="relative padding-[4mm] box-border w-full h-full grid grid-rows-[auto_1fr_auto]"
@@ -47,7 +46,7 @@ export const BingoCard: React.FC<BingoCardProps> = ({
         color: style.textColor,
       }}
     >
-      <div className="bingo-card-title text-center text-3xl font-bold mb-0">
+      <div className="text-center text-3xl font-bold mb-0">
         {title}{" "}
         {gameNumber != null && (
           <span
@@ -60,8 +59,11 @@ export const BingoCard: React.FC<BingoCardProps> = ({
       </div>
 
       <table
-        className="bingo w-full h-full border-collapse table table-fixed"
-        style={{ borderColor: style.tableColor }}
+        className="w-full h-full border-collapse table table-fixed"
+        style={{
+          backgroundColor: style.tableColor,
+          borderColor: style.borderColor,
+        }}
       >
         <thead>
           <tr>
@@ -69,7 +71,10 @@ export const BingoCard: React.FC<BingoCardProps> = ({
               <th
                 key={h}
                 className="text-center text-2xl"
-                style={{ borderColor: style.tableColor }}
+                style={{
+                  backgroundColor: style.background,
+                  borderColor: style.borderColor,
+                }}
               >
                 {h}
               </th>
@@ -77,13 +82,16 @@ export const BingoCard: React.FC<BingoCardProps> = ({
           </tr>
         </thead>
         <tbody>
-          {cardMatrix.map((row: any, r: number) => (
+          {card.grid.map((row: Cell[], r: number) => (
             <tr key={r}>
-              {row.map((cell: any, c: number) => (
+              {row.map((cell: Cell, c: number) => (
                 <td
                   key={c}
-                  style={{ borderColor: style.tableColor }}
-                  className="border-2 border-black w-full text-center text-3xl p-[5mm] font-semibold tracking-[1px] has-[img]:p-[2mm]"
+                  style={{
+                    borderColor: style.borderColor,
+                    padding: cell.type === "image" ? 0 : "5mm",
+                  }}
+                  className="border-2 w-full text-center text-3xl font-semibold tracking-[1px]"
                 >
                   {renderCell(cell)}
                 </td>
@@ -93,11 +101,7 @@ export const BingoCard: React.FC<BingoCardProps> = ({
         </tbody>
       </table>
 
-      {footer && (
-        <div className="bingo-card-footer text-center text-base font-medium mt-[3mm]">
-          {footer}
-        </div>
-      )}
+      <div className="text-center text-base font-medium mt-[3mm]">{footer}</div>
     </div>
   );
 };

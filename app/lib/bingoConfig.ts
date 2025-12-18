@@ -5,7 +5,8 @@ export const defaultConfig: BingoConfig = {
     title: "BINGO",
     footer: "Lycka till!",
     gameNumber: 1,
-    forceUnique: true,
+    emptyGrid: false,
+    unique: true,
     freeCenter: false,
   },
   printing: {

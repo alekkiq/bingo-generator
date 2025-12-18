@@ -5,6 +5,7 @@ import { useState } from "react";
 export interface CardStyle {
   background: string;
   tableColor: string;
+  borderColor: string;
   textColor: string;
   fontFamily: string;
   gameNumberBackground: string;
@@ -15,7 +16,8 @@ export interface CardStyle {
 
 export const defaultStyle: CardStyle = {
   background: "#fff",
-  tableColor: "#000",
+  tableColor: "#fff",
+  borderColor: "#000",
   textColor: "#000",
   fontFamily: "Roboto",
   gameNumberBackground: "#eee",

@@ -7,8 +7,9 @@ export const GeneratorSchema = z.object({
     title: z.string(),
     footer: z.string().optional(),
     gameNumber: z.number().int().optional(),
-    forceUnique: z.boolean(),
+    unique: z.boolean(),
     freeCenter: z.boolean(),
+    emptyGrid: z.boolean(),
   }),
   printing: z.object({
     count: z.number().int().min(1).max(500),
@@ -20,6 +21,7 @@ export const GeneratorRequestSchema = z.object({
   amount: z.coerce.number().int().min(1).max(500).default(8),
   freeCenter: z.coerce.boolean().default(false),
   freeCenterValue: z.string().optional(),
+  emptyGrid: z.boolean().default(false),
   unique: z.coerce.boolean().default(true),
   seed: z.coerce.number().optional(),
 

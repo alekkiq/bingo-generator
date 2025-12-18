@@ -2,7 +2,8 @@ export interface GameConfig {
   title: string;
   footer: string;
   gameNumber: number;
-  forceUnique: boolean;
+  emptyGrid: boolean;
+  unique: boolean;
   freeCenter: boolean;
 }
 

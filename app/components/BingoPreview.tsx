@@ -28,6 +28,7 @@ const BingoPreview: React.FC<BingoPreviewProps> = ({ game, style }) => {
     footer: game.footer,
     gameNumber: game.gameNumber,
     freeCenterCell: freeCenterCell,
+    emptyGrid: game.emptyGrid,
   });
 
   const result: GeneratorResult = generator.generate(1, game.freeCenter);

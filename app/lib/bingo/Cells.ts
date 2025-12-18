@@ -14,3 +14,8 @@ export const imageCell = (src: string): Cell => ({
   type: "image",
   src,
 });
+
+export const emptyCell = (): Cell => ({
+  type: "empty",
+  value: "00",
+});

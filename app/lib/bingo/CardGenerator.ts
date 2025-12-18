@@ -8,18 +8,20 @@ import {
   GeneratorResult,
   GeneratedCard,
 } from "./types";
-import { textCell, imageCell, numberCell } from "./Cells";
+import { textCell, imageCell, numberCell, emptyCell } from "./Cells";
 
 export interface GeneratorOptions {
   title?: string;
   footer?: string;
   gameNumber?: number;
   freeCenterCell?: Cell;
+  emptyGrid?: boolean;
 }
 
 export class CardGenerator {
   private meta: GeneratorMeta;
   private freeCenterCell: Cell;
+  private emptyGrid: boolean;
 
   constructor(options: GeneratorOptions = {}) {
     this.meta = {
@@ -28,23 +30,40 @@ export class CardGenerator {
       gameNumber: options.gameNumber ?? undefined,
     };
     this.freeCenterCell = options.freeCenterCell ?? textCell("FREE");
+    this.emptyGrid = options.emptyGrid ?? false;
   }
 
-  private singleCard(freeCenter = false, freeCenterCell?: Cell): Card {
-    const ranges: Record<ColumnKey, number[]> = {
-      B: Array.from({ length: 15 }, (_, i) => i + 1),
-      I: Array.from({ length: 15 }, (_, i) => i + 16),
-      N: Array.from({ length: 15 }, (_, i) => i + 31),
-      G: Array.from({ length: 15 }, (_, i) => i + 46),
-      O: Array.from({ length: 15 }, (_, i) => i + 61),
-    };
-
+  private singleCard(freeCenter = false, overrideFreeCenterCell?: Cell): Card {
     const columns: Record<ColumnKey, Cell[]> = {
       B: [],
       I: [],
       N: [],
       G: [],
       O: [],
+    };
+
+    const centerCell = overrideFreeCenterCell ?? this.freeCenterCell;
+
+    // empty grid mode
+    if (this.emptyGrid) {
+      for (const col of ["B", "I", "N", "G", "O"] as ColumnKey[]) {
+        columns[col] = Array.from({ length: 5 }, emptyCell);
+      }
+
+      if (freeCenter) {
+        columns.N[2] = centerCell;
+      }
+
+      return columns;
+    }
+
+    // number grid mode
+    const ranges: Record<ColumnKey, number[]> = {
+      B: Array.from({ length: 15 }, (_, i) => i + 1),
+      I: Array.from({ length: 15 }, (_, i) => i + 16),
+      N: Array.from({ length: 15 }, (_, i) => i + 31),
+      G: Array.from({ length: 15 }, (_, i) => i + 46),
+      O: Array.from({ length: 15 }, (_, i) => i + 61),
     };
 
     for (const col of Object.keys(ranges) as ColumnKey[]) {
@@ -74,6 +93,7 @@ export class CardGenerator {
     let attempts = 0;
     let id = 1;
 
+    // enforce uniqueness
     while (cards.length < count && attempts < maxAttempts) {
       attempts++;
 
