@@ -1,19 +1,6 @@
 "use client";
 
-import {
-  Box,
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
-  TextField,
-  Typography,
-  FormControlLabel,
-  Switch,
-  Tooltip,
-  IconButton,
-  Button,
-} from "@mui/material";
-import { Info } from "@mui/icons-material";
+import { Grid, Typography, FormControlLabel, Switch } from "@mui/material";
 import { GeneratorConfig } from "@/schemas/generator";
 import LabeledInput from "../fields/LabeledInput";
 
@@ -24,8 +11,8 @@ interface GameSetupFormProps {
 
 const GameSetupForm: React.FC<GameSetupFormProps> = ({ game, onChange }) => {
   return (
-    <Box>
-      <Typography variant="h4" component="h2">
+    <>
+      <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
         Game settings
       </Typography>
 
@@ -34,7 +21,6 @@ const GameSetupForm: React.FC<GameSetupFormProps> = ({ game, onChange }) => {
         label="Game title"
         type="text"
         variant="filled"
-        tooltip="Game title shown on top of each bingo card"
         fullWidth
         value={game.title ?? ""}
         onChange={(e) =>
@@ -46,7 +32,6 @@ const GameSetupForm: React.FC<GameSetupFormProps> = ({ game, onChange }) => {
         label="Footer text"
         type="text"
         variant="filled"
-        tooltip="Additional text to show below the bingo card"
         fullWidth
         value={game.footer ?? ""}
         onChange={(e) =>
@@ -58,52 +43,51 @@ const GameSetupForm: React.FC<GameSetupFormProps> = ({ game, onChange }) => {
         label="Game number"
         type="number"
         variant="filled"
-        tooltip="Additional text to show below the bingo card"
-        fullWidth
-        value={game.footer ?? ""}
-        onChange={(e) =>
-          onChange({ footer: e.target.value === "" ? "" : e.target.value })
-        }
-      />
-      <TextField
-        label="Game number"
-        type="number"
+        tooltip="Adds a number indicator to indicate which game / round is being played. Set as 0 for no numbering."
         fullWidth
         value={game.gameNumber ?? ""}
-        onChange={(e) =>
+        onChange={(e) => {
           onChange({
-            gameNumber:
-              e.target.value === "" ? undefined : Number(e.target.value),
-          })
-        }
+            gameNumber: Number(e.target.value) < 0 ? 0 : Number(e.target.value),
+          });
+        }}
       />
-      <FormControlLabel
-        label="Empty grid"
-        control={
-          <Switch
-            checked={!!game.emptyGrid}
-            onChange={(e) =>
-              onChange({
-                emptyGrid: e.target.checked,
-              })
+
+      <Grid container spacing={2}>
+        <Grid size={6}>
+          <FormControlLabel
+            label="Empty grid"
+            sx={{ marginInlineStart: 0 }}
+            control={
+              <Switch
+                checked={!!game.emptyGrid}
+                onChange={(e) =>
+                  onChange({
+                    emptyGrid: e.target.checked,
+                  })
+                }
+              />
             }
           />
-        }
-      />
-      <FormControlLabel
-        label="Free center tile"
-        control={
-          <Switch
-            checked={!!game.freeCenter}
-            onChange={(e) =>
-              onChange({
-                freeCenter: e.target.checked,
-              })
+        </Grid>
+        <Grid size={6}>
+          <FormControlLabel
+            label="Free center tile"
+            sx={{ marginInlineStart: 0 }}
+            control={
+              <Switch
+                checked={!!game.freeCenter}
+                onChange={(e) =>
+                  onChange({
+                    freeCenter: e.target.checked,
+                  })
+                }
+              />
             }
           />
-        }
-      />
-    </Box>
+        </Grid>
+      </Grid>
+    </>
   );
 };
 

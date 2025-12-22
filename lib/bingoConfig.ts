@@ -12,5 +12,6 @@ export const defaultConfig: BingoConfig = {
   printing: {
     count: 30,
     perPage: 4,
+    format: "pdf",
   },
 };

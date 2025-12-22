@@ -6,6 +6,7 @@ import GameSetupForm from "./steps/GameSetupForm";
 import AppearanceForm from "./steps/AppearanceForm";
 import PrintOptionsForm from "./steps/PrintOptionsForm";
 
+import { Settings, Palette, Print } from "@mui/icons-material";
 import { GeneratorConfig } from "@/schemas/generator";
 import { CardStyle } from "@/hooks/useStyleConfig";
 
@@ -29,10 +30,12 @@ const FormsPanel: React.FC<FormsPanelProps> = ({
   const formSteps = [
     {
       label: "Settings",
+      icon: Settings,
       component: <GameSetupForm game={gameConfig} onChange={updateGame} />,
     },
     {
       label: "Styles",
+      icon: Palette,
       component: (
         <AppearanceForm
           styles={styleConfig}
@@ -43,6 +46,7 @@ const FormsPanel: React.FC<FormsPanelProps> = ({
     },
     {
       label: "Printing",
+      icon: Print,
       component: (
         <PrintOptionsForm options={printConfig} onChange={updatePrinting} />
       ),
@@ -51,8 +55,8 @@ const FormsPanel: React.FC<FormsPanelProps> = ({
 
   return (
     <Box>
-      <Paper>
-        <FormWizard steps={formSteps} />
+      <Paper sx={{ padding: "0.5rem" }}>
+        <FormWizard steps={formSteps} onSubmit={() => console.log("moro")} />
       </Paper>
     </Box>
   );

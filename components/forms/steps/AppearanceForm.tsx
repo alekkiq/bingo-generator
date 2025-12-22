@@ -4,17 +4,15 @@ import { ChangeEvent } from "react";
 import { useUpload } from "@/hooks";
 import {
   Box,
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
+  Grid,
   TextField,
   Typography,
   FormControlLabel,
   Switch,
-  Tooltip,
-  IconButton,
   Button,
 } from "@mui/material";
+import { MuiColorInput } from "mui-color-input";
+import LabeledInput from "../fields/LabeledInput";
 import { Info, CloudUpload } from "@mui/icons-material";
 import { CardStyle } from "@/hooks";
 import { GeneratorConfig } from "@/schemas/generator";
@@ -57,91 +55,177 @@ const AppearanceForm: React.FC<AppearanceFormProps> = ({
   };
 
   return (
-    <Box>
-      <Typography variant="h4" component="h2">
+    <>
+      <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
         Card styling
       </Typography>
 
-      <TextField
-        label="Card background"
-        type="color"
-        fullWidth
-        value={styles.background}
-        onChange={(e) => onChange({ background: e.target.value })}
-      />
-      <TextField
-        label="Text color"
-        type="color"
-        fullWidth
-        value={styles.textColor}
-        onChange={(e) => onChange({ textColor: e.target.value })}
-      />
-      <TextField
-        label="Table color"
-        type="color"
-        fullWidth
-        value={styles.tableColor}
-        onChange={(e) => onChange({ tableColor: e.target.value })}
-      />
-      <TextField
-        label="Border color"
-        type="color"
-        fullWidth
-        value={styles.borderColor}
-        onChange={(e) => onChange({ borderColor: e.target.value })}
-      />
-      <TextField
-        label="Game number background"
-        type="color"
-        fullWidth
-        value={styles.gameNumberBackground}
-        onChange={(e) => onChange({ gameNumberBackground: e.target.value })}
-      />
+      <Grid container spacing={1}>
+        <Grid size={12}>
+          <Typography
+            fontWeight={500}
+            variant="caption"
+            className="text-neutral-600"
+            component="h3"
+            textTransform="uppercase"
+            marginBlockEnd={"-0.25rem"}
+          >
+            General colors
+          </Typography>
+        </Grid>
+        <Grid size={6}>
+          <MuiColorInput
+            format="hex"
+            variant="filled"
+            label="Background color"
+            fullWidth
+            value={styles.background}
+            onChange={(col) => onChange({ background: col })}
+          />
+        </Grid>
+        <Grid size={6}>
+          <MuiColorInput
+            format="hex"
+            variant="filled"
+            label="Text color"
+            fullWidth
+            value={styles.textColor}
+            onChange={(col) => onChange({ textColor: col })}
+          />
+        </Grid>
+        <Grid size={12}>
+          <MuiColorInput
+            format="hex"
+            variant="filled"
+            label="Game number background"
+            fullWidth
+            value={styles.gameNumberBackground}
+            onChange={(col) => onChange({ gameNumberBackground: col })}
+          />
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={1}>
+        <Grid size={12}>
+          <Typography
+            fontWeight={500}
+            variant="caption"
+            className="text-neutral-600"
+            component="h3"
+            textTransform="uppercase"
+            marginBlockEnd={"-0.25rem"}
+          >
+            Grid colors
+          </Typography>
+        </Grid>
+        <Grid size={6}>
+          <MuiColorInput
+            format="hex"
+            variant="filled"
+            label="Grid background"
+            fullWidth
+            value={styles.tableColor}
+            onChange={(col) => onChange({ tableColor: col })}
+          />
+        </Grid>
+        <Grid size={6}>
+          <MuiColorInput
+            format="hex"
+            variant="filled"
+            label="Grid border color"
+            fullWidth
+            value={styles.borderColor}
+            onChange={(col) => onChange({ borderColor: col })}
+          />
+        </Grid>
+      </Grid>
       <TextField
         label="Font family"
         fullWidth
         value={styles.fontFamily}
         onChange={(e) => onChange({ fontFamily: e.target.value })}
       />
-      {freeCenter && (
-        <>
-          <FormControlLabel
-            label="Use image for free center"
-            control={
-              <Switch
-                checked={!!styles.freeCenterImage}
-                onChange={(e) => handleToggleFreeCenterImage(e.target.checked)}
-              />
-            }
-          />
 
-          {!styles.freeCenterImage ? (
-            <TextField
-              label="Free center text"
-              fullWidth
-              value={styles.freeCenterContent ?? ""}
-              onChange={(e) => onChange({ freeCenterContent: e.target.value })}
-            />
-          ) : (
-            <Button
-              component="label"
-              variant="contained"
-              tabIndex={-1}
-              disabled={uploading}
-              startIcon={<CloudUpload />}
-            >
-              Upload image
-              <input
-                type="file"
-                hidden
-                accept="image/*"
-                onChange={handleFileChange}
+      <LabeledInput
+        id="font-family"
+        label="Font family"
+        type="select"
+        variant="filled"
+        fullWidth
+        value={styles.fontFamily}
+        onChange={(e) => onChange({ fontFamily: e.target.value })}
+      />
+
+      {freeCenter && (
+        <Grid container spacing={2}>
+          <Grid size={6}>
+            {!styles.freeCenterImage ? (
+              <LabeledInput
+                id="free-center-text"
+                label="Free center text"
+                type="text"
+                variant="filled"
+                fullWidth
+                value={styles.freeCenterContent ?? ""}
+                onChange={(e) =>
+                  onChange({ freeCenterContent: e.target.value })
+                }
               />
-            </Button>
-          )}
-        </>
+            ) : (
+              <LabeledInput
+                id="free-center-image"
+                label="Free center image"
+                fullWidth
+                input={
+                  <Button
+                    component="label"
+                    variant="contained"
+                    tabIndex={-1}
+                    disabled={uploading}
+                    startIcon={<CloudUpload />}
+                  >
+                    Upload image
+                    <input
+                      type="file"
+                      hidden
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </Button>
+                }
+              />
+            )}
+          </Grid>
+          <Grid size={6}>
+            <FormControlLabel
+              label="Use an image instead"
+              sx={{ marginInlineStart: 0 }}
+              control={
+                <Switch
+                  checked={!!styles.freeCenterImage}
+                  onChange={(e) =>
+                    handleToggleFreeCenterImage(e.target.checked)
+                  }
+                />
+              }
+            />
+          </Grid>
+        </Grid>
       )}
-    </Box>
+      <p></p>
+      {/* commented out for now
+      <TextField
+        label="Custom CSS"
+        fullWidth
+        multiline
+        minRows={4}
+        placeholder=".bingo-card { border: 3px dashed red; }"
+        value={styles.customCss ?? ""}
+        onChange={(e) => onChange({ customCss: e.target.value })}
+        sx={{ mt: 2 }}
+      />
+      */}
+    </>
   );
 };
 

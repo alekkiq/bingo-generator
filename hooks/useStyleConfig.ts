@@ -12,6 +12,7 @@ export interface CardStyle {
   freeCenterContent?: string;
   freeCenterImage?: boolean;
   freeCenterImageUrl?: string;
+  customCss?: string;
 }
 
 export const defaultStyle: CardStyle = {
@@ -24,6 +25,7 @@ export const defaultStyle: CardStyle = {
   freeCenterContent: "FREE",
   freeCenterImage: false,
   freeCenterImageUrl: "",
+  customCss: "",
 };
 
 export const useStyleConfig = () => {

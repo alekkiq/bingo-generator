@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactElement, useState } from "react";
+import { useState } from "react";
 import {
   Stepper,
   Step,
@@ -9,85 +9,125 @@ import {
   Typography,
   Button,
   Box,
+  StepConnector,
+  Icon,
+  StepIconProps,
+  Divider,
+  Stack,
 } from "@mui/material";
+import {
+  NavigateNext,
+  NavigateBefore,
+  Download,
+  Done,
+} from "@mui/icons-material";
 
 export interface FormStep {
   label: string;
-  component: ReactElement;
+  icon?: any;
+  component: React.ReactNode;
 }
 
 interface FormWizardProps {
   steps: FormStep[];
+  onSubmit: CallableFunction;
+  submitLabel?: string;
 }
 
-const FormWizard: React.FC<FormWizardProps> = ({ steps }) => {
-  const [activeStep, setActiveStep] = useState(0);
-  const [skipped, setSkipped] = useState<Set<number>>(new Set());
+interface WizardStepIconProps extends StepIconProps {
+  iconComponent: React.ElementType;
+}
 
-  const isStepSkipped = (step: number) => skipped.has(step);
+const WizardStepIcon: React.FC<WizardStepIconProps> = ({
+  active,
+  completed,
+  iconComponent: Icon,
+}) => {
+  return (
+    <Icon
+      fontSize="small"
+      color={active || completed ? "primary" : "disabled"}
+    />
+  );
+};
+
+const FormWizard: React.FC<FormWizardProps> = ({
+  steps,
+  onSubmit,
+  submitLabel = "Generate",
+}) => {
+  const [activeStep, setActiveStep] = useState(0);
+
+  const isLastStep = activeStep === steps.length - 1;
 
   const handleNext = () => {
-    let newSkipped = skipped;
-    if (isStepSkipped(activeStep)) {
-      newSkipped = new Set(newSkipped.values());
-      newSkipped.delete(activeStep);
+    if (isLastStep) {
+      onSubmit();
+    } else {
+      setActiveStep((prev) => prev + 1);
     }
-    setActiveStep((prev) => prev + 1);
-    setSkipped(newSkipped);
   };
 
-  const handleBack = () => setActiveStep((prev) => prev - 1);
-
-  const handleReset = () => setActiveStep(0);
+  const handleBack = () => {
+    setActiveStep((prev) => Math.max(prev - 1, 0));
+  };
 
   return (
     <>
       <Stepper activeStep={activeStep}>
-        {steps.map((label, index) => {
-          const stepProps: { completed?: boolean } = {};
-          const labelProps: {
-            optional?: React.ReactNode;
-          } = {};
-          if (isStepSkipped(index)) {
-            stepProps.completed = false;
-          }
-          return (
-            <Step key={label.label} {...stepProps}>
-              <StepLabel {...labelProps}>{label.label}</StepLabel>
-            </Step>
-          );
-        })}
+        {steps.map((step, index) => (
+          <Step key={step.label}>
+            <StepButton
+              sx={{ paddingBlock: 1.5 }}
+              onClick={() => setActiveStep(index)}
+            >
+              <StepLabel
+                slots={{
+                  stepIcon: (props) => (
+                    <WizardStepIcon {...props} iconComponent={step.icon} />
+                  ),
+                }}
+              >
+                {step.label}
+              </StepLabel>
+            </StepButton>
+          </Step>
+        ))}
       </Stepper>
 
-      {activeStep === steps.length ? (
-        <>
-          <Typography sx={{ mt: 2, mb: 1 }}>
-            All steps completed — you&apos;re finished
-          </Typography>
-          <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-            <Box sx={{ flex: "1 1 auto" }} />
-            <Button onClick={handleReset}>Reset</Button>
-          </Box>
-        </>
-      ) : (
-        <>
-          {steps[activeStep].component}
-          <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-            <Button
-              color="inherit"
-              disabled={activeStep === 0}
-              onClick={handleBack}
-              sx={{ mr: 1 }}
-            >
-              Back
-            </Button>
-            <Box sx={{ flex: "1 1 auto" }} />
-            <Button onClick={handleNext}>
-              {activeStep === steps.length - 1 ? "Finish" : "Next"}
-            </Button>
-          </Box>
-        </>
-      )}
+      <Divider sx={{ mt: 2 }} />
+
+      <Stack spacing={2} sx={{ mt: 2 }}>
+        {steps[activeStep].component}
+      </Stack>
+
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          pt: 3,
+        }}
+      >
+        <Button
+          color="inherit"
+          disabled={activeStep === 0}
+          onClick={handleBack}
+          variant="contained"
+          startIcon={<NavigateBefore />}
+        >
+          Back
+        </Button>
+
+        <Box sx={{ flex: "1 1 auto" }} />
+
+        <Button
+          variant="contained"
+          onClick={handleNext}
+          endIcon={isLastStep ? <Done /> : <NavigateNext />}
+        >
+          {isLastStep ? submitLabel : "Next"}
+        </Button>
+      </Box>
     </>
   );
 };

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PRINTING_FORMATS, CARDS_PER_PAGE_OPTIONS } from "@/types/bingoConfig";
 
 export type GeneratorConfig = z.infer<typeof GeneratorSchema>;
 
@@ -13,7 +14,15 @@ export const GeneratorSchema = z.object({
   }),
   printing: z.object({
     count: z.number().int().min(1).max(500),
-    perPage: z.number().int().min(1).max(6),
+    perPage: z.union(
+      CARDS_PER_PAGE_OPTIONS.map((v) => z.literal(v)) as [
+        z.ZodLiteral<1>,
+        z.ZodLiteral<2>,
+        z.ZodLiteral<4>,
+        z.ZodLiteral<6>
+      ]
+    ),
+    format: z.enum(PRINTING_FORMATS),
   }),
 });
 
